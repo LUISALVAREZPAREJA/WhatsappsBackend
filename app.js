@@ -140,8 +140,18 @@ app.post('/cancel-send', (req, res) => {
 QRPortalWeb();
 
 // Start the server
-const PORT = process.env.PORT || 5000; // Usa el puerto que Railway asigna automáticamente
-console.log(`Listening on port: ${PORT}`);
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 3000;
+
+const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+});
+
+// Manejo de errores para el servidor
+server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+        console.error(`El puerto ${PORT} ya está en uso.`);
+        // Aquí puedes decidir si salir o intentar otro puerto
+    } else {
+        console.error(`Error en el servidor: ${error.message}`);
+    }
 });
