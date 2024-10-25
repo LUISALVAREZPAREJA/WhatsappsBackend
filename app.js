@@ -141,6 +141,7 @@ QRPortalWeb();
 
 // Start the server
 const PORT = process.env.PORT || 5000; // Usa el puerto que Railway asigna automáticamente
+console.log(`Listening on port: ${PORT}`);
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
