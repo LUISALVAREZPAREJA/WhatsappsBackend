@@ -6,7 +6,7 @@
     "scripts": {
         "prestart": "npx eslint . --no-ignore",
         "pre-copy": "cd .. && npm run  copy.lib base-baileys-memory",
-         "start": "PORT=5000 node app.js"
+        "start": "node app.js"
     },
     "keywords": [],
     "dependencies": {
