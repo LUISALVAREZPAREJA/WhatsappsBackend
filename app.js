@@ -136,16 +136,14 @@ app.post('/cancel-send', (req, res) => {
     return res.status(400).json({ status: 'error', message: 'No messages are being sent.' });
 });
 
-// Start the QR Portal
-QRPortalWeb();
-
 // Start the server
 const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
+// Start the QR Portal
+QRPortalWeb();
 // Manejo de errores para el servidor
 server.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
