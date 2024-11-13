@@ -40,7 +40,7 @@ const bot = createBot({
 });
 
 // Set an interval to execute cleanOldSessions every 24 hours
-//setInterval(cleanOldSessions, 5 * 60 * 1000); // Every 5 minutes
+setInterval(cleanOldSessions, 5 * 60 * 1000); // Every 5 minutes
 
 // Variable to control the message-sending state
 let sendingMessages = false;
