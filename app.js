@@ -11,7 +11,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: 'https://whatsappsfrontend.vercel.app' }));
 app.use(express.json({ limit: '10kb' })); // Set request body limit to 10KB
 app.use(express.urlencoded({ extended: true })); // For handling URL-encoded data
 
