@@ -137,7 +137,7 @@ app.post('/cancel-send', (req, res) => {
 });
 
 // Start the QR Portal
-//QRPortalWeb();
+QRPortalWeb();
 
 // Start the server
 const PORT = process.env.PORT || 3000;
