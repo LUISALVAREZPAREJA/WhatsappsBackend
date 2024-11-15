@@ -61,10 +61,15 @@ app.post('/send-message', upload.single('file'), async (req, res) => {
         };
     }
 
-    // Check if the message and numbers are valid
-    if (!message || !Array.isArray(numbers) || numbers.length === 0) {
-        return res.status(400).json({ status: 'error', message: 'Invalid message or numbers' });
-    }
+   // Si numbers es una cadena, conviértelo en un array
+if (typeof numbers === 'string') {
+    numbers = numbers.split(',').map(num => num.trim());
+}
+
+// Validar que numbers ahora sea un array
+if (!message || !Array.isArray(numbers) || numbers.length === 0) {
+    return res.status(400).json({ status: 'error', message: 'Invalid message or numbers' });
+}
 
     console.log('Message received:', message, 'for numbers:', numbers);
     sendingMessages = true; // Mark that messages are being sent
