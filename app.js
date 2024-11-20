@@ -11,7 +11,17 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-app.use(cors({ origin: 'https://whatsappsfrontend.vercel.app' }));
+const allowedOrigins = ['http://localhost:3001', 'https://whatsappsfrontend.vercel.app'];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+}));;
 app.use(express.json({ limit: '10kb' })); // Set request body limit to 10KB
 app.use(express.urlencoded({ extended: true })); // For handling URL-encoded data
 
@@ -140,7 +150,7 @@ app.post('/cancel-send', (req, res) => {
 QRPortalWeb();
 
 // Start the server
-const PORT = 3000;
+const PORT = 5000;
 
 const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
