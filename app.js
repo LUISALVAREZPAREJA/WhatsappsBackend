@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const { createBot, createProvider, createFlow } = require('@bot-whatsapp/bot');
 const QRPortalWeb = require('@bot-whatsapp/portal');
 const BaileysProvider = require('@bot-whatsapp/provider/baileys');
@@ -11,7 +12,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const allowedOrigins = ['http://localhost:3001', 'https://whatsappsfrontend.vercel.app'];
+const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -50,7 +51,7 @@ const bot = createBot({
 });
 
 // Set an interval to execute cleanOldSessions every 24 hours
-setInterval(cleanOldSessions, 5 * 60 * 1000); // Every 5 minutes
+setInterval(cleanOldSessions, 30 * 60 * 1000); // Every 1 minutes
 
 // Variable to control the message-sending state
 let sendingMessages = false;
@@ -150,7 +151,7 @@ app.post('/cancel-send', (req, res) => {
 QRPortalWeb();
 
 // Start the server
-const PORT = 3000;
+const PORT = process.env.PORT;
 
 const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
