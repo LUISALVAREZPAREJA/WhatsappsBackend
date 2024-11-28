@@ -9,9 +9,10 @@ const Papa = require('papaparse'); // For processing CSV files
 const cleanOldSessions = require('./sessionCleaner'); // Session cleaner function
 const path = require('path');
 const fs = require('fs');
+require('dotenv').config();
 
 const app = express();
-const allowedOrigins = ['http://localhost:3001', 'https://whatsappsfrontend.vercel.app'];
+const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -150,7 +151,7 @@ app.post('/cancel-send', (req, res) => {
 QRPortalWeb();
 
 // Start the server
-const PORT = 3000;
+const PORT = process.env.PORT;
 
 const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
