@@ -129,9 +129,23 @@ app.post('/cancel-send', (req, res) => {
 
 // Define a separate route for the QR portal
 app.get('/qr', (req, res) => {
-    QRPortalWeb(); // This will handle the QR code in this route
-    res.send('QR Portal running at /qr'); // Placeholder response
+    const qrSource = [
+        path.join(process.cwd(), 'bot.qr.png'), // Ruta donde debería estar el archivo QR
+        path.join(__dirname, '..', 'bot.qr.png'),
+        path.join(__dirname, 'bot.qr.png'),
+    ].find((i) => fs.existsSync(i));
+
+    // Si no encuentra el archivo QR, muestra un error o una imagen predeterminada
+    if (!qrSource) {
+        return res.status(404).send('QR no encontrado');
+    }
+
+    // Si encuentra el archivo QR, lo envía como respuesta
+    res.sendFile(qrSource);
 });
+
+// Servir los archivos estáticos (si es necesario)
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Start the server
 const PORT = process.env.PORT || 3000;
