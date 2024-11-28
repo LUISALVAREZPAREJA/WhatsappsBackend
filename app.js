@@ -151,7 +151,7 @@ app.post('/cancel-send', (req, res) => {
 QRPortalWeb();
 
 // Start the server
-const PORT = process.env.PORT;
+const PORT = process.env.PORT2;
 
 const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
