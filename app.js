@@ -7,14 +7,11 @@ const MockAdapter = require('@bot-whatsapp/database/mock');
 const multer = require('multer'); // For handling file uploads
 const path = require('path');
 const fs = require('fs');
-const http = require('http');
-const socketIo = require('socket.io');
 require('dotenv').config();
-const { useSingleFileAuthState, makeWASocket, makeWALegacySocket, disconnect } = require('@adiwajshing/baileys');
+
 
 
 const app = express();
-const io = socketIo(server);
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 
 app.use(cors({
