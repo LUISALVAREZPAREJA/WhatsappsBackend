@@ -7,12 +7,14 @@ const MockAdapter = require('@bot-whatsapp/database/mock');
 const multer = require('multer'); // For handling file uploads
 const path = require('path');
 const fs = require('fs');
-const { useSingleFileAuthState, makeWASocket } = require('@adiwajshing/baileys');
+const http = require('http');
+const socketIo = require('socket.io');
 require('dotenv').config();
+const { useSingleFileAuthState, makeWASocket, makeWALegacySocket, disconnect } = require('@adiwajshing/baileys');
+
 
 const app = express();
-// Start the server
-const PORT = process.env.PORT || 3000;
+const io = socketIo(server);
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 
 app.use(cors({
@@ -131,58 +133,27 @@ app.post('/cancel-send', (req, res) => {
 });
 
 // Define a separate route for the QR portal
-let qrScanned = false; // Estado para saber si el QR fue escaneado
+app.get('/qr', (req, res) => {
+    const qrSource = [
+        path.join(process.cwd(), 'bot.qr.png'), // Ruta donde debería estar el archivo QR
+        path.join(__dirname, '..', 'bot.qr.png'),
+        path.join(__dirname, 'bot.qr.png'),
+    ].find((i) => fs.existsSync(i));
 
-// Inicializar Baileys y escuchar eventos
-const { state, saveState } = useSingleFileAuthState('./auth_info.json');
+    // Si no encuentra el archivo QR, muestra un error o una imagen predeterminada
+    if (!qrSource) {
+        return res.status(404).send('QR no encontrado');
+    }
 
-const startWhatsApp = () => {
-    const sock = makeWASocket({
-        auth: state,
-    });
-
-    sock.ev.on('connection.update', (update) => {
-        const { connection, lastDisconnect } = update;
-
-        if (connection === 'close') {
-            const shouldReconnect =
-                lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
-            console.log('Conexión cerrada, intentando reconectar:', shouldReconnect);
-            if (shouldReconnect) {
-                startWhatsApp();
-            }
-        } else if (connection === 'open') {
-            console.log('Conexión exitosa');
-        }
-    });
-
-    sock.ev.on('creds.update', saveState);
-};
-
-startWhatsApp();
-
-// Ruta para obtener el QR
-app.get("/qr", (req, res) => {
-  const qrSource = [
-    path.join(process.cwd(), "bot.qr.png"),
-    path.join(__dirname, "..", "bot.qr.png"),
-    path.join(__dirname, "bot.qr.png"),
-  ].find((i) => fs.existsSync(i));
-
-  if (qrSource) {
+    // Si encuentra el archivo QR, lo envía como respuesta
     res.sendFile(qrSource);
-  } else {
-    res.status(404).send("QR no encontrado");
-  }
-});
-
-// Ruta para verificar si el QR fue escaneado
-app.get("/qr-status", (req, res) => {
-  res.json({ qrScanned }); // Enviamos el estado del QR (true o false)
 });
 
 // Servir los archivos estáticos (si es necesario)
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Start the server
+const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
