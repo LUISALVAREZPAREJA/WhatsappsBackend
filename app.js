@@ -7,7 +7,7 @@ const MockAdapter = require('@bot-whatsapp/database/mock');
 const multer = require('multer'); // For handling file uploads
 const path = require('path');
 const fs = require('fs');
-const { default: makeWASocket, useSingleFileAuthState } = require("@adiwajshing/baileys");
+const { useSingleFileAuthState, makeWASocket } = require('@adiwajshing/baileys');
 require('dotenv').config();
 
 const app = express();
@@ -134,27 +134,29 @@ app.post('/cancel-send', (req, res) => {
 let qrScanned = false; // Estado para saber si el QR fue escaneado
 
 // Inicializar Baileys y escuchar eventos
-const startWhatsApp = async () => {
-  const { state, saveState } = useSingleFileAuthState("./auth_info.json");
-  const sock = makeWASocket({
-    auth: state,
-  });
+const { state, saveState } = useSingleFileAuthState('./auth_info.json');
 
-  sock.ev.on("connection.update", (update) => {
-    const { connection, qr } = update;
+const startWhatsApp = () => {
+    const sock = makeWASocket({
+        auth: state,
+    });
 
-    if (qr) {
-      console.log("QR generado");
-      qrScanned = false; // El QR se ha generado, no ha sido escaneado aún
-    }
+    sock.ev.on('connection.update', (update) => {
+        const { connection, lastDisconnect } = update;
 
-    if (connection === "open") {
-      console.log("¡Sesión iniciada! QR escaneado.");
-      qrScanned = true; // El QR ha sido escaneado
-    }
-  });
+        if (connection === 'close') {
+            const shouldReconnect =
+                lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
+            console.log('Conexión cerrada, intentando reconectar:', shouldReconnect);
+            if (shouldReconnect) {
+                startWhatsApp();
+            }
+        } else if (connection === 'open') {
+            console.log('Conexión exitosa');
+        }
+    });
 
-  sock.ev.on("creds.update", saveState);
+    sock.ev.on('creds.update', saveState);
 };
 
 startWhatsApp();
