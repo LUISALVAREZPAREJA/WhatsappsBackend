@@ -1,3 +1,4 @@
+// sessionCleaner.js
 const fs = require('fs');
 const path = require('path');
 
@@ -5,11 +6,15 @@ const path = require('path');
 const sessionDir = './bot_sessions'; // Cambia esto por tu directorio real
 const excludeFiles = ['baileys_store.json','creds.json']; // Archivos que no deben ser eliminados
 
+// Definir una función printer para indicar que la función se ejecutó
+const printer = (message) => {
+    console.log(message); // Actualmente solo imprime en consola
+};
+
 // Función para detectar la sesión activa y limpiar claves antiguas
 const cleanOldSessions = () => {
     fs.readdir(sessionDir, (err, files) => {
         if (err) {
-            console.error('Error al leer el directorio de sesiones:', err);
             return;
         }
 
@@ -17,7 +22,6 @@ const cleanOldSessions = () => {
         const sessionFiles = files.filter(file => file.endsWith('.json') && !excludeFiles.includes(file));
 
         if (sessionFiles.length === 0) {
-            console.log('No se encontraron archivos de sesión adicionales.');
             return;
         }
 
@@ -33,25 +37,22 @@ const cleanOldSessions = () => {
             }
         });
 
-        console.log(`La sesión activa es: ${latestFile}`);
-
         // Eliminar todos los archivos pre-key-XX y las sesiones antiguas, excepto el más reciente
         sessionFiles.forEach(file => {
             if (file !== latestFile) {
                 const filePath = path.join(sessionDir, file);
                 fs.unlink(filePath, (err) => {
                     if (err) {
-                        console.error(`Aun no hay archivo prekey creado: ${file}`);
-                    } else {
-                        console.log(`Archivo de sesión eliminado: ${file}`);
+                        return;
                     }
                 });
             }
         });
-
-        // Limpieza específica de archivos pre-key-XX (excepto el más reciente)
-        
     });
+
+    // Indicar que la función se ejecutó
+    printer('La función cleanOldSessions se ejecutó correctamente');
 };
 
-module.exports = cleanOldSessions;
+// Exporta la función correctamente
+module.exports = { cleanOldSessions };
